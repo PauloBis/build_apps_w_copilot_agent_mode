@@ -1,21 +1,28 @@
-from pymongo import MongoClient
+from djongo import models
 
-# MongoDB client setup
-client = MongoClient('localhost', 27017)
-db = client['octofit_db']
+class User(models.Model):
+    _id = models.ObjectIdField()
+    username = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=100)
 
-# Example: Accessing collections
-def get_users_collection():
-    return db['users']
+class Team(models.Model):
+    _id = models.ObjectIdField()
+    name = models.CharField(max_length=100)
+    members = models.ArrayReferenceField(to=User, on_delete=models.CASCADE)
 
-def get_teams_collection():
-    return db['teams']
+class Activity(models.Model):
+    _id = models.ObjectIdField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    activity_type = models.CharField(max_length=100)
+    duration = models.DurationField()
 
-def get_activity_collection():
-    return db['activity']
+class Leaderboard(models.Model):
+    _id = models.ObjectIdField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    score = models.IntegerField()
 
-def get_leaderboard_collection():
-    return db['leaderboard']
-
-def get_workouts_collection():
-    return db['workouts']
+class Workout(models.Model):
+    _id = models.ObjectIdField()
+    name = models.CharField(max_length=100)
+    description = models.TextField()
